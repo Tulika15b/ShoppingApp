@@ -9,6 +9,9 @@ import java.io.Serializable
 data class CartProductModel (
 
     @ColumnInfo
+    var cart_prod_id : Int,
+
+    @ColumnInfo
     var cart_prod_name : String,
 
     @ColumnInfo

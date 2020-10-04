@@ -22,11 +22,12 @@ class CartViewModel (application: Application) : AndroidViewModel(application){
     }
 
     suspend fun getAllCartItems() : List<CartProductModel>{
-        return repository.getAllCartProducts()
+        return repository.getAllCartProductsGrouped()
+        //return repository.getAllCartProducts()
     }
 
      suspend fun insertToCart(product: Product, qty : Int){
-        var item : CartProductModel = CartProductModel(product.prodName, product.prodPrice, qty, product.prodImageUrl)
+        var item : CartProductModel = CartProductModel(product.prodId, product.prodName, product.prodPrice, qty, product.prodImageUrl)
         repository.insertProduct(item)
     }
 

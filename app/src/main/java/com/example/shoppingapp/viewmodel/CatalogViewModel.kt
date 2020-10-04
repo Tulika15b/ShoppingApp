@@ -14,6 +14,7 @@ import com.example.shoppingapp.repository.CartRepository
 import com.example.shoppingapp.repository.CatalogRepository
 import com.example.shoppingapp.service.CatalogService
 import com.example.shoppingapp.service.CatalogWebService
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -49,7 +50,10 @@ import retrofit2.Response
             override fun onResponse(call: Call<CategoryCatalogResponse>, response: Response<CategoryCatalogResponse>) {
                 if(response.isSuccessful){
                     allCategories.value = response.body()?.results
-                    repository.insertAllCategories(allCategories.value!!)
+                    GlobalScope.launch {
+                        repository.insertAllCategories(allCategories.value!!)
+                    }
+
                 }
             }
         })
@@ -67,9 +71,10 @@ import retrofit2.Response
             }
             override fun onResponse(call: Call<ProductCatalogResponse>, response: Response<ProductCatalogResponse>) {
                 if(response.isSuccessful){
-
                     allProducts.value = response.body()?.results
-                    repository.insertAllProducts(allProducts.value!!)
+                    GlobalScope.launch {
+                        repository.insertAllProducts(allProducts.value!!)
+                    }
 
                     //allProductsByCategory.value = repository.getProductsCategoryWise(id).value!!
 
@@ -89,7 +94,7 @@ import retrofit2.Response
         return allProducts
     }
 
-     fun getProductById(id : String) : Product{
+     suspend fun getProductById(id : String) : Product{
         return repository.getProductById(id)
      }
 

@@ -11,7 +11,7 @@ class CartRepository @Inject constructor(private val cartDao: CartDao) {
 
     fun insertProduct(item : CartProductModel)  = cartDao.insertProduct(item)
 
-    fun getAllCartProducts() = cartDao.getAllCartProducts()
-
     fun getTotalCartValue() = cartDao.getTotalCartValue()
+
+    fun getAllCartProductsGrouped() = cartDao.groupCartItems()
 }

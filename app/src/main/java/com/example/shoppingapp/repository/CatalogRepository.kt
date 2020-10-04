@@ -14,11 +14,11 @@ class CatalogRepository @Inject constructor(private val catalogDao: CatalogDao) 
 
     fun getProducts() = catalogDao.fetchProducts()
 
-    fun getProductById(id : String) = catalogDao.getProductById(id)
+    suspend fun getProductById(id : String) = catalogDao.getProductById(id)
 
     fun getProductsCategoryWise(id : String) = catalogDao.getProductByCategoryId(id)
 
-    fun insertAllCategories(categories: List<Category>) = catalogDao.insertAllCategories(categories)
+    suspend fun insertAllCategories(categories: List<Category>) = catalogDao.insertAllCategories(categories)
 
     fun insertAllProducts(products : List<Product>) = catalogDao.insertAllProducts(products)
 

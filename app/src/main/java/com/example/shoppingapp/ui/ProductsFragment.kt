@@ -34,6 +34,7 @@ import com.yuyakaido.android.cardstackview.*
 import com.yuyakaido.android.cardstackview.RewindAnimationSetting
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_products.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -210,7 +211,7 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
             adapter.setProducts(products)
         }
 
-        val result : List<Product> = mViewModel.getProductbyCategory(strMatch)
+        //val result : List<Product> = mViewModel.getProductbyCategory(strMatch)
 
         /*val res : List<CategoryWithProducts> = mViewModel.getCategoryWithProducts()
         val res2 : List<ProductWithCategories> = mViewModel.getProductWithCategories()*/
@@ -226,9 +227,10 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
 
         if(direction == Direction.Top){
             Log.d("OCS", "Card swiped up")
-
-            var product: Product = mViewModel.getProductById(lastAppearedItemId)
-            addToCart(product, lastAppearedQty)
+            lifecycleScope.launch(Dispatchers.IO){
+                var product: Product = mViewModel.getProductById(lastAppearedItemId)
+                addToCart(product, lastAppearedQty)
+            }
         }
         else if(direction == Direction.Right){
             Log.d("OCS", "Card swiped right")
