@@ -9,9 +9,7 @@ import com.example.shoppingapp.data.AppRoomDatabase
 import com.example.shoppingapp.data.CatalogDao
 import com.example.shoppingapp.data.CategoryCatalogResponse
 import com.example.shoppingapp.data.ProductCatalogResponse
-import com.example.shoppingapp.model.CartProductModel
-import com.example.shoppingapp.model.Category
-import com.example.shoppingapp.model.Product
+import com.example.shoppingapp.model.*
 import com.example.shoppingapp.repository.CartRepository
 import com.example.shoppingapp.repository.CatalogRepository
 import com.example.shoppingapp.service.CatalogService
@@ -46,10 +44,12 @@ import retrofit2.Response
         retrofitCall.enqueue(object : Callback<CategoryCatalogResponse> {
             override fun onFailure(call: Call<CategoryCatalogResponse>, t: Throwable) {
                 Log.d("CVM", "Failed to fetch category data")
+                allCategories.value
             }
             override fun onResponse(call: Call<CategoryCatalogResponse>, response: Response<CategoryCatalogResponse>) {
                 if(response.isSuccessful){
                     allCategories.value = response.body()?.results
+                    repository.insertAllCategories(allCategories.value!!)
                 }
             }
         })
@@ -97,6 +97,13 @@ import retrofit2.Response
          return repository.getProductsCategoryWise(idStr)
      }
 
+     fun getProductWithCategories() : List<ProductWithCategories>{
+         return repository.getProductWithCategories()
+     }
+
+     fun getCategoryWithProducts() : List<CategoryWithProducts>{
+         return repository.getCategoryWithProducts()
+     }
 
 
 }

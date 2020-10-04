@@ -8,10 +8,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.shoppingapp.model.CartProductModel
 import com.example.shoppingapp.model.Category
+import com.example.shoppingapp.model.CategoryProductsCrossRef
 import com.example.shoppingapp.model.Product
 import com.example.shoppingapp.util.DataConverter
 
-@Database(entities = [Category::class, Product::class, CartProductModel::class], version = 1, exportSchema = false)
+@Database(entities = [Category::class, Product::class, CartProductModel::class, CategoryProductsCrossRef::class], version = 1, exportSchema = false)
 @TypeConverters(DataConverter::class)
 abstract class AppRoomDatabase : RoomDatabase() {
 

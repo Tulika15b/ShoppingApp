@@ -24,7 +24,9 @@ import com.example.shoppingapp.adapter.CategoryRVAdapter
 import com.example.shoppingapp.adapter.ProductRVAdapter
 import com.example.shoppingapp.databinding.FragmentProductsBinding
 import com.example.shoppingapp.model.Category
+import com.example.shoppingapp.model.CategoryWithProducts
 import com.example.shoppingapp.model.Product
+import com.example.shoppingapp.model.ProductWithCategories
 import com.example.shoppingapp.viewmodel.CartViewModel
 import com.example.shoppingapp.viewmodel.CatalogViewModel
 import com.yuyakaido.android.cardstackview.*
@@ -113,7 +115,9 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
         binding = DataBindingUtil.inflate(inflater,
             R.layout.fragment_products,container,false)
 
+        binding.loadingProgress.visibility = View.VISIBLE
         mViewModel.fetchCategories()?.observe(viewLifecycleOwner) { categories ->
+            binding.loadingProgress.visibility = View.GONE
             binding.categoryListRv.apply {
                 layoutManager = LinearLayoutManager(activity, RecyclerView.HORIZONTAL, false)
                 adapter = CategoryRVAdapter(categories) { category -> itemClicked(category)
@@ -196,6 +200,9 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
         }
 
         val result : List<Product> = mViewModel.getProductbyCategory(strMatch)
+
+        /*val res : List<CategoryWithProducts> = mViewModel.getCategoryWithProducts()
+        val res2 : List<ProductWithCategories> = mViewModel.getProductWithCategories()*/
     }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {

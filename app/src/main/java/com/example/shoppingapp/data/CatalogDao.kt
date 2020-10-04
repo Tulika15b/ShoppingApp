@@ -1,12 +1,11 @@
 package com.example.shoppingapp.data
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.shoppingapp.model.Category
+import com.example.shoppingapp.model.CategoryWithProducts
 import com.example.shoppingapp.model.Product
+import com.example.shoppingapp.model.ProductWithCategories
 
 @Dao
 interface CatalogDao {
@@ -18,7 +17,7 @@ interface CatalogDao {
     fun getCategoryById(Id: String): LiveData<Category>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllCategories(categories: List<Category>)
+    fun insertAllCategories(categories: List<Category>)
 
 
 
@@ -36,5 +35,14 @@ interface CatalogDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
      fun insertAllProducts(products: List<Product>)
 
+
+
+    @Transaction
+    @Query("SELECT * FROM categories")
+    fun getCategoryWithProducts(): List<CategoryWithProducts>
+
+    @Transaction
+    @Query("SELECT * FROM products")
+    fun getProductWithCategories(): List<ProductWithCategories>
 
 }
