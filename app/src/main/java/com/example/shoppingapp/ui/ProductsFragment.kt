@@ -6,11 +6,14 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-
 import android.view.*
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
+import androidx.core.os.postDelayed
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -24,16 +27,16 @@ import com.example.shoppingapp.adapter.CategoryRVAdapter
 import com.example.shoppingapp.adapter.ProductRVAdapter
 import com.example.shoppingapp.databinding.FragmentProductsBinding
 import com.example.shoppingapp.model.Category
-import com.example.shoppingapp.model.CategoryWithProducts
 import com.example.shoppingapp.model.Product
-import com.example.shoppingapp.model.ProductWithCategories
 import com.example.shoppingapp.viewmodel.CartViewModel
 import com.example.shoppingapp.viewmodel.CatalogViewModel
 import com.yuyakaido.android.cardstackview.*
+import com.yuyakaido.android.cardstackview.RewindAnimationSetting
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_products.*
 import kotlinx.coroutines.launch
 import java.util.*
+
 
 @AndroidEntryPoint
 class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
@@ -66,8 +69,10 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
 
 
         mSensorManager = context?.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        Objects.requireNonNull(mSensorManager)!!.registerListener(sensorListener, mSensorManager!!
-            .getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL)
+        Objects.requireNonNull(mSensorManager)!!.registerListener(
+            sensorListener, mSensorManager!!
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL
+        )
         acceleration = 10f
         currentAcceleration = SensorManager.GRAVITY_EARTH
         lastAcceleration = SensorManager.GRAVITY_EARTH
@@ -78,10 +83,12 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
             val x = event.values[0]
             val y = event.values[1]
             val z = event.values[2]
+
             lastAcceleration = currentAcceleration
             currentAcceleration = Math.sqrt((x * x + y * y + z * z).toDouble()).toFloat()
             val delta: Float = currentAcceleration - lastAcceleration
             acceleration = acceleration * 0.9f + delta
+
             if (acceleration > 10) {
                 Toast.makeText(context, "Shake event detected", Toast.LENGTH_SHORT).show()
                 mCallback.showCartDetails()
@@ -92,7 +99,7 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -112,8 +119,10 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,
-            R.layout.fragment_products,container,false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_products, container, false
+        )
 
         binding.loadingProgress.visibility = View.VISIBLE
         mViewModel.fetchCategories()?.observe(viewLifecycleOwner) { categories ->
@@ -130,8 +139,10 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
     }
 
     override fun onResume() {
-        mSensorManager?.registerListener(sensorListener, mSensorManager!!.getDefaultSensor(
-            Sensor .TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL
+        mSensorManager?.registerListener(
+            sensorListener, mSensorManager!!.getDefaultSensor(
+                Sensor.TYPE_ACCELEROMETER
+            ), SensorManager.SENSOR_DELAY_NORMAL
         )
         super.onResume()
     }
@@ -178,10 +189,10 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
             visibility = View.VISIBLE
         }
         var strMatch : String = "%id\\\":14%"
-        mViewModel.fetchProducts(strMatch)?.observe(viewLifecycleOwner) {products ->
+        mViewModel.fetchProducts(strMatch)?.observe(viewLifecycleOwner) { products ->
 
             layoutManager = CardStackLayoutManager(activity, this).apply {
-                setSwipeableMethod(SwipeableMethod.Manual)
+                setSwipeableMethod(SwipeableMethod.AutomaticAndManual)
                 setDirections(listOf(Direction.Right, Direction.Top, Direction.Left))
                 setVisibleCount(3)
                 setStackFrom(StackFrom.Top)
@@ -213,23 +224,30 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
         binding.qtyNumber.setText("1")
         qty = 1;
 
-        when(direction){
-            Direction.Left -> {
-                Log.d("OCS", "Card swiped left")
-                binding.productStackView.apply {
-                    swipe()
-                }
+        if(direction == Direction.Top){
+            Log.d("OCS", "Card swiped up")
+            var product: Product = mViewModel.getProductById(lastAppearedItemId)
+            addToCart(product, lastAppearedQty)
+        }
+        else if(direction == Direction.Right){
+            Log.d("OCS", "Card swiped right")
+            binding.productStackView.apply {
+                val settings = RewindAnimationSetting.Builder()
+                    .setDirection(Direction.Right)
+                    .setDuration(Duration.Normal.duration)
+                    .setInterpolator(DecelerateInterpolator())
+                    .build()
+
+                val cardStackLayoutManager2 = CardStackLayoutManager(context)
+                cardStackLayoutManager2.setRewindAnimationSetting(settings)
+                this.layoutManager = cardStackLayoutManager2
+                this.rewind()
             }
-            Direction.Right -> {
-                Log.d("OCS", "Card swiped right")
-                binding.productStackView.apply {
-                    rewind()
-                }
-            }
-            Direction.Top -> {
-                Log.d("OCS", "Card swiped up")
-                var product : Product = mViewModel.getProductById(lastAppearedItemId)
-                addToCart(product, lastAppearedQty)
+        }
+        else if(direction == Direction.Left){
+            Log.d("OCS", "Card swiped left")
+            binding.productStackView.apply {
+                swipe()
             }
         }
     }
@@ -249,10 +267,9 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
     override fun onCardDisappeared(view: View?, position: Int) {
         lastAppearedItemId = view?.tag.toString()
         lastAppearedQty = qty
-        Log.d("OCD", "onCardDisappeared" + view?.tag.toString())
-
     }
-    fun addToCart(product : Product, qty : Int){
+
+    fun addToCart(product: Product, qty: Int){
         lifecycleScope.launch {
             mCartViewModel.insertToCart(product, qty)
         }
