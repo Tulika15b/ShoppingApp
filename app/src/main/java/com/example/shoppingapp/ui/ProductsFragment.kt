@@ -145,6 +145,9 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
             visibility = View.VISIBLE
         }
 
+        binding.qtyNumber.setText("1")
+        qty = 1;
+
         // '%id":14%'
 
         mViewModel.fetchProducts(category.categoryId)?.observe(viewLifecycleOwner) { products ->
