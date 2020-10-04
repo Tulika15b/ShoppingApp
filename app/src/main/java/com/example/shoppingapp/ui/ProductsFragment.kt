@@ -124,8 +124,8 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
             inflater,
             R.layout.fragment_products, container, false
         )
-
         binding.loadingProgress.visibility = View.VISIBLE
+
         mViewModel.fetchCategories()?.observe(viewLifecycleOwner) { categories ->
             binding.loadingProgress.visibility = View.GONE
             binding.categoryListRv.apply {
