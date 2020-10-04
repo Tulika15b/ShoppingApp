@@ -54,7 +54,7 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
     private val mCartViewModel : CartViewModel by viewModels ()
     lateinit var lastAppearedItemId : String
     var lastAppearedQty : Int = 1
-
+    private val manager by lazy { CardStackLayoutManager(context, this) }
     var qty = 1;
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -239,9 +239,10 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
                     .setInterpolator(DecelerateInterpolator())
                     .build()
 
-                val cardStackLayoutManager2 = CardStackLayoutManager(context)
-                cardStackLayoutManager2.setRewindAnimationSetting(settings)
-                this.layoutManager = cardStackLayoutManager2
+                manager.setRewindAnimationSetting(settings)
+                manager.setDirections(listOf(Direction.Right, Direction.Top, Direction.Left))
+
+                layoutManager = manager
                 this.rewind()
             }
         }
@@ -266,6 +267,7 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
     }
 
     override fun onCardDisappeared(view: View?, position: Int) {
+        Log.d("OCA", "onCardDisappeared" + view?.tag.toString())
         lastAppearedItemId = view?.tag.toString()
         lastAppearedQty = qty
     }
