@@ -60,7 +60,7 @@ import retrofit2.Response
         return allCategories
     }
 
-    fun fetchProducts(id : String) : MutableLiveData<List<Product>>?{
+    fun fetchProducts(id : Int) : MutableLiveData<List<Product>>?{
 
         val request = CatalogService.buildService(CatalogWebService::class.java)
         val retrofitCall = request.fetchProducts()
@@ -74,9 +74,11 @@ import retrofit2.Response
                     allProducts.value = response.body()?.results
                     GlobalScope.launch {
                         repository.insertAllProducts(allProducts.value!!)
+                        //repository.getCategoryWithProducts()
+                        //repository.getProductWithCategories()
                     }
 
-                    //allProductsByCategory.value = repository.getProductsCategoryWise(id).value!!
+                    allProductsByCategory.value = repository.getProductsByCategoryId(id)
 
                 }
             }
@@ -89,17 +91,13 @@ import retrofit2.Response
             allProductsByCategory.value = repository.getProductsCategoryWise(matchStr)
 
         }*/
-        //return allProductsByCategory
+        return allProductsByCategory
 
-        return allProducts
+        //return allProducts
     }
 
      suspend fun getProductById(id : String) : Product{
         return repository.getProductById(id)
-     }
-
-     fun getProductbyCategory(idStr : String) : List<Product>{
-         return repository.getProductsCategoryWise(idStr)
      }
 
      fun getProductWithCategories() : List<ProductWithCategories>{

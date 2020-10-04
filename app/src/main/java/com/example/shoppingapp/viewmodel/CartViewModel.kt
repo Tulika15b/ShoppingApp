@@ -23,7 +23,6 @@ class CartViewModel (application: Application) : AndroidViewModel(application){
 
     suspend fun getAllCartItems() : List<CartProductModel>{
         return repository.getAllCartProductsGrouped()
-        //return repository.getAllCartProducts()
     }
 
      suspend fun insertToCart(product: Product, qty : Int){

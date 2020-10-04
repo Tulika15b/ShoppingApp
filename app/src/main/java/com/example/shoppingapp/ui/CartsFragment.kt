@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class CartsFragment : Fragment() {
 
-    var mSensorManager : SensorManager? = null
     private lateinit var binding : FragmentCartDetailsBinding
     private val mViewModel: CartViewModel by viewModels()
 
@@ -50,7 +49,6 @@ class CartsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch{
             val result : List<CartProductModel> = mViewModel.getAllCartItems()
-
             shopping_cart_rv.apply {
                 layoutManager = LinearLayoutManager(activity)
                 adapter = CartProductRVAdapter(context, result)

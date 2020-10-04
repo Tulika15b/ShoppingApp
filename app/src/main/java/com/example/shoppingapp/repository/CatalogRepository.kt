@@ -16,7 +16,7 @@ class CatalogRepository @Inject constructor(private val catalogDao: CatalogDao) 
 
     suspend fun getProductById(id : String) = catalogDao.getProductById(id)
 
-    fun getProductsCategoryWise(id : String) = catalogDao.getProductByCategoryId(id)
+    fun getProductsByCategoryId(id : Int) = catalogDao.getProductByCategoryId(id)
 
     suspend fun insertAllCategories(categories: List<Category>) = catalogDao.insertAllCategories(categories)
 

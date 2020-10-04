@@ -139,6 +139,37 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
         return binding.root
     }
 
+    private fun itemClicked(category: Category) {
+        Log.d("PF", "Item clicked" + category.categoryId);
+        binding.qtyChangerLl.apply {
+            visibility = View.VISIBLE
+        }
+
+        // '%id":14%'
+
+        mViewModel.fetchProducts(category.categoryId)?.observe(viewLifecycleOwner) { products ->
+
+            layoutManager = CardStackLayoutManager(activity, this).apply {
+                setSwipeableMethod(SwipeableMethod.Manual)
+                setDirections(listOf(Direction.Right, Direction.Top, Direction.Left))
+                setVisibleCount(3)
+                setStackFrom(StackFrom.Top)
+                setOverlayInterpolator(LinearInterpolator())
+            }
+            adapter = context?.let { ProductRVAdapter(it, products) }!!
+            product_stack_view.layoutManager = layoutManager
+            product_stack_view.adapter = adapter
+            product_stack_view.itemAnimator.apply {
+                if (this is DefaultItemAnimator) {
+                    supportsChangeAnimations = false
+                }
+            }
+
+            adapter.setProducts(products)
+        }
+
+    }
+
     override fun onResume() {
         mSensorManager?.registerListener(
             sensorListener, mSensorManager!!.getDefaultSensor(
@@ -184,38 +215,7 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
         }
     }
 
-    private fun itemClicked(category: Category) {
-        Log.d("PF", "Item clicked" + category.categoryId);
-        binding.qtyChangerLl.apply {
-            visibility = View.VISIBLE
-        }
-        var strMatch : String = "%id\\\":14%"
-        mViewModel.fetchProducts(strMatch)?.observe(viewLifecycleOwner) { products ->
 
-            layoutManager = CardStackLayoutManager(activity, this).apply {
-                setSwipeableMethod(SwipeableMethod.Manual)
-                setDirections(listOf(Direction.Right, Direction.Top, Direction.Left))
-                setVisibleCount(3)
-                setStackFrom(StackFrom.Top)
-                setOverlayInterpolator(LinearInterpolator())
-            }
-            adapter = context?.let { ProductRVAdapter(it, products) }!!
-            product_stack_view.layoutManager = layoutManager
-            product_stack_view.adapter = adapter
-            product_stack_view.itemAnimator.apply {
-                if (this is DefaultItemAnimator) {
-                    supportsChangeAnimations = false
-                }
-            }
-
-            adapter.setProducts(products)
-        }
-
-        //val result : List<Product> = mViewModel.getProductbyCategory(strMatch)
-
-        /*val res : List<CategoryWithProducts> = mViewModel.getCategoryWithProducts()
-        val res2 : List<ProductWithCategories> = mViewModel.getProductWithCategories()*/
-    }
 
     override fun onCardDragging(direction: Direction?, ratio: Float) {
 

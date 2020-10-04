@@ -26,15 +26,14 @@ interface CatalogDao {
     @Query("SELECT * FROM products ORDER BY prodName")
     fun fetchProducts(): LiveData<List<Product>>
 
-    @Query("SELECT * FROM products WHERE parentCategorylist LIKE :matchStr")
-    fun getProductByCategoryId(matchStr: String): List<Product>
+    @Query("SELECT * FROM products WHERE parentCategorylist LIKE '%id\":' || :categoryId || ',%'")
+    fun getProductByCategoryId(categoryId: Int): List<Product>
 
     @Query("SELECT * FROM products WHERE prodId = :Id")
     fun getProductById(Id: String): Product
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
      fun insertAllProducts(products: List<Product>)
-
 
 
     @Transaction
