@@ -16,6 +16,6 @@ interface CartDao {
     @Query("SELECT * FROM CartProductModel")
     fun getAllCartProducts(): List<CartProductModel>
 
-    @Query("SELECT SUM(cart_prod_price) FROM CartProductModel")
+    @Query("SELECT SUM(cart_prod_price*cart_prod_qty) FROM CartProductModel")
     fun getTotalCartValue(): Int
 }

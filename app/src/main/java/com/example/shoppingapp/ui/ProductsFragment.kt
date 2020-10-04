@@ -192,7 +192,7 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
         mViewModel.fetchProducts(strMatch)?.observe(viewLifecycleOwner) { products ->
 
             layoutManager = CardStackLayoutManager(activity, this).apply {
-                setSwipeableMethod(SwipeableMethod.AutomaticAndManual)
+                setSwipeableMethod(SwipeableMethod.Manual)
                 setDirections(listOf(Direction.Right, Direction.Top, Direction.Left))
                 setVisibleCount(3)
                 setStackFrom(StackFrom.Top)
@@ -226,6 +226,7 @@ class ProductsFragment : Fragment(), View.OnClickListener, CardStackListener {
 
         if(direction == Direction.Top){
             Log.d("OCS", "Card swiped up")
+
             var product: Product = mViewModel.getProductById(lastAppearedItemId)
             addToCart(product, lastAppearedQty)
         }
